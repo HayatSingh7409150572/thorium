@@ -1,15 +1,17 @@
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/userModel");
 
-const createUser = async function (abcd, xyz) {
+//---createuseer------------------------------------------------------------------------------------------------------------------------------------------------------
+const createUser = async function (req, res) {
   //You can name the req, res objects anything.
   //but the first parameter is always the request 
   //the second parameter is always the response
-  let data = abcd.body;
+  let data = req.body;
   let savedData = await userModel.create(data);
-  console.log(abcd.newAtribute);
-  xyz.send({ msg: savedData });
+  console.log(res.newAtribute);
+  res.send({ msg: savedData });
 };
+//---------LoginByEmailAndPassword---------------------------------------------------------------------------------------------------------------------------------------
 
 const loginUser = async function (req, res) {
   let userName = req.body.emailId;
@@ -28,6 +30,7 @@ const loginUser = async function (req, res) {
   // The decision about what data to put in token depends on the business requirement
   // Input 2 is the secret
   // The same secret will be used to decode tokens
+
   let token = jwt.sign(
     {
       userId: user._id.toString(),
@@ -40,6 +43,7 @@ const loginUser = async function (req, res) {
   res.send({ status: true, data: token });
 };
 
+//--------GetUSersData-------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 const getUserData = async function (req, res) {
   let token = req.headers["x-Auth-token"];
   if (!token) token = req.headers["x-auth-token"];
@@ -54,6 +58,7 @@ const getUserData = async function (req, res) {
   // Input 1 is the token to be decoded
   // Input 2 is the same secret with which the token was generated
   // Check the value of the decoded token yourself
+
   let decodedToken = jwt.verify(token, "functionup-thorium");
   if (!decodedToken)
     return res.send({ status: false, msg: "token is invalid" });
@@ -66,6 +71,7 @@ const getUserData = async function (req, res) {
   res.send({ status: true, data: userDetails });
 };
 
+//-------------UpdateUser-----------------------------------------------------------------------------------------------------------------------------------------------------------
 const updateUser = async function (req, res) {
 // Do the same steps here:
 // Check if the token is present
@@ -84,6 +90,7 @@ const updateUser = async function (req, res) {
   res.send({ status: updatedUser, data: updatedUser });
 };
 
+//---------------PostMessage--------------------------------------------------------------------------------------------------------------------------------------------------
 const postMessage = async function (req, res) {
     let message = req.body.message
     // Check if the token is present
@@ -115,8 +122,32 @@ const postMessage = async function (req, res) {
     return res.send({status: true, data: updatedUser})
 }
 
+
+
+
+const isdeletedUser = async function (req, res) {
+  let isDeletedId = req.params.userId;
+  let isDeletedProperty = await userModel.findByIdAndUpdate({_id:isDeletedId},{$set: {isDeleted:true}},{new:true});
+  res.send({ status: true, data: isDeletedProperty });
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 module.exports.createUser = createUser;
 module.exports.getUserData = getUserData;
 module.exports.updateUser = updateUser;
 module.exports.loginUser = loginUser;
-module.exports.postMessage = postMessage
+module.exports.postMessage = postMessage;
+module.exports.isdeletedUser=isdeletedUser;
+
